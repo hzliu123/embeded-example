@@ -114,7 +114,7 @@ int kernel_thread(int (*fn)(void *), void * arg, char *name) {
 	 * preempted prematurely. Timer interrupt calls schedule() if 
 	 * current->preempt_count == 0 
 	 */
-	nt->preempt_count = 1;
+	nt->preempt_count = 0;	/* CHANGE TO 1 AFTER SYNC. CODE IS READY */
 	nt->pid = ++last_pid;
 	snprintf(nt->comm, TASK_COMM_LEN, name);
 	list_add_tail(&nt->tasks, &init_task->tasks);
@@ -160,38 +160,17 @@ static inline struct task_struct *context_switch(struct task_struct *prev,
 void schedule() {
 	struct task_struct *prev, *next;
 
-	if (current->preempt_count == 0 || current->state == TASK_EXITING)
-	       goto need_resched;
-
-	printk("BUG: schedule() while preempt_count != 0\n");
-	return;
-
-need_resched:
-	preempt_disable();
-	need_resched = 0;
-	prev = current;
-
-	/*
-	 * move prev task to the end of the tasks list
-	 * note: exiting process was removed from the list when do_exit()
+	/* -- YOU WRITE CODE HERE --
+	 * preemption should be disabled to avoid race condition if schedule() 
+	 * is called from timer interrupt. you will need to reset need_resched
+	 * flag, adjust the order of current task in the task list, find next
+	 * task on the task list, and call context_switch(prev, next) to switch
+	 * tasks. Note that TASK_EXITING task is not on the task list.
 	 */
-	if (prev != init_task && prev->state != TASK_EXITING)
-		list_move_tail(&prev->tasks, &init_task->tasks);
-
-	/* 
-	 * find next runnable task on task list. The search always start from
-	 * next of init_task. init_task will be selected if it's the only 
-	 * runnable task on the list
-	 */
-	list_for_each_entry (next, &init_task->tasks, tasks) 
-		if (next->state == TASK_RUNNING)
-			break;
 
 	if (prev != next)
 		context_switch(prev, next);
 
-	preempt_enable_no_resched();
-	if (need_resched) goto need_resched;
 	return;
 }
 

@@ -115,25 +115,19 @@ extern volatile unsigned long jiffies;
 
 /* note: sigprocmask() is itself a barrier() */
 static inline void local_irq_save(sigset_t *oset) {
-	sigset_t set;
-	sigfillset(&set);
-	sigprocmask(SIG_SETMASK, &set, oset);
+	/* YOU WRITE CODE HERE */	
 }
 
 static inline void local_irq_restore(sigset_t *oset) {
-	sigprocmask(SIG_SETMASK, oset, NULL);
+	/* YOU WRITE CODE HERE */	
 }
 
 static inline void local_irq_disable() {
-	sigset_t set;
-	sigfillset(&set);
-	sigprocmask(SIG_SETMASK, &set, NULL);
+	/* YOU WRITE CODE HERE */	
 }
 
 static inline void local_irq_enable() {
-	sigset_t set;
-	sigemptyset(&set);
-	sigprocmask(SIG_SETMASK, &set, NULL);
+	/* YOU WRITE CODE HERE */	
 }
 
 /* REP NOP (PAUSE) is a good thing to insert into busy-wait loops. */
@@ -142,27 +136,22 @@ static inline void local_irq_enable() {
 
 #define preempt_disable()		\
 do { 					\
-	current->preempt_count++;	\
-	barrier();			\
+	/* YOU WRITE CODE HERE */	\
 } while (0)
 
 #define preempt_enable_no_resched()	\
 do { 					\
-	barrier();			\
-	current->preempt_count--;	\
+	/* YOU WRITE CODE HERE */	\
 } while (0)
 
 #define preempt_check_resched()		\
 do {					\
-	if (need_resched && current->preempt_count == 0) \
-		schedule();		\
+	/* YOU WRITE CODE HERE */	\
 } while (0)
 
 #define preempt_enable()		\
 do {					\
-	preempt_enable_no_resched();	\
-	barrier();			\
-	preempt_check_resched();	\
+	/* YOU WRITE CODE HERE */	\
 } while (0)
 
 extern void sched_init();

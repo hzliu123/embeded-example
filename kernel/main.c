@@ -60,6 +60,8 @@ void cpu_idle (void)
 {
 	while (1) {
 		while (!need_resched) {
+			/* remove line below after timer interrupt is up */
+			need_resched = 1;
 			cpu_relax();
 		}
 		schedule();

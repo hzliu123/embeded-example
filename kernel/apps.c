@@ -26,23 +26,23 @@ static int ridx, widx;
 #define queue_empty() (ridx == widx)
 #define queue_full() (ridx-widx == 1 || widx-ridx == QLEN-1)
 
+/* -- PRONE TO RACE CONDITION, YOU ADD SYNCHRONIZATION CODE BELOW -- */  
 static int producer(void *nouse) {
 	int enqueue_count = 0, enqueue_sum = 0;
 
 	printk("Producer thread started.\n");
 
 	while (1) {
-		preempt_disable();
 try_queue:
 		if (queue_full()) {
-			preempt_enable();
-
 			if (enqueue_count > 0) {
 				printk("%d values queued, sum = %d\n", 
 					enqueue_count, enqueue_sum);
 				enqueue_sum = enqueue_count = 0;
 			}
 			cpu_relax();
+			/* remove line below after timer interrupt is up */
+			schedule();
 			continue;
 		}
 		
@@ -56,23 +56,23 @@ try_queue:
 }
 
 
+/* -- PRONE TO RACE CONDITION, YOU ADD SYNCHRONIZATION CODE BELOW -- */  
 static int consumer(void *nouse) {
 	int dequeue_count = 0, dequeue_sum = 0;
 
 	printk("Consumer thread started.\n");
 
 	while (1) {
-		preempt_disable();
 try_dequeue:
 		if (queue_empty()) {
-			preempt_enable();
-
 			if (dequeue_count > 0) {
 				printk("%d values dequeued, sum = %d\n", 
 					dequeue_count, dequeue_sum);
 				dequeue_sum = dequeue_count = 0;
 			}
 			cpu_relax();
+			/* remove line below after interrupt is up */
+			schedule();
 			continue;
 		}
 

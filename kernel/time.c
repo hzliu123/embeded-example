@@ -13,22 +13,12 @@ volatile unsigned long jiffies = 0;
 
 
 void timer_interrupt(int num) {
-	jiffies++;
-	if (jiffies % (TIMER_PRINTK_RATE*HZ) == 0)
-		printk("%d threads running\n", nr_threads); 
 
-	if (current->time_slice > 0) 
-		if (--current->time_slice == 0) {
-			need_resched = 1;
-			current->time_slice = HZ;
-		}
-
-	/* 
-	 * equivalent to Linux ret_from_intr:
+	/* -- YOU WRITE CODE HERE -- 
+	 * jiffies and current process timeslice update,
+	 * if timeslice == 0, set the need_resched flag
 	 * if need_resched and preemptable, run schedule()
 	 */
-	if (need_resched && current->preempt_count == 0)
-		schedule();
 }
 
 /* 
@@ -47,30 +37,11 @@ void timer_interrupt(int num) {
  * solve the problem.
  */
 void time_init() {
-	const unsigned long tick_usec = 1000000 / HZ;
-	const unsigned long usec_per_sec = 1000000;
-	struct sigaction act;
-	struct itimerval value;
 
-	/* xtime: wall time init */
-
-	/* 
-	 * setup_irq()
-	 * hook signal handler as timer interrupt handler
+	/* -- YOU WRITE CODE HERE -- 
+	 * 1) setup_irq()
+	 *    hook signal handler as timer interrupt handler
+	 * 2) set_pit_timer() - timer chip programming
+	 *    setup Linux interval timer
 	 */
-	act.sa_handler = timer_interrupt;
-	sigemptyset(&act.sa_mask);
-	act.sa_flags = SA_NODEFER;
-	sigaction(SIGALRM, &act, NULL);
-
-	/* 
-	 * set_pit_timer() - timer chip programming
-	 * setup Linux interval timer
-	 */
-	value.it_interval.tv_sec = tick_usec / usec_per_sec;
-	value.it_interval.tv_usec = tick_usec % usec_per_sec;
-	value.it_value = value.it_interval;
-	setitimer(ITIMER_REAL, &value, NULL);
-
-	printk("Timer initialized.\n");	
 }
