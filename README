@@ -1,0 +1,56 @@
+===================
+NOTE FOR 2.6 KERNEL
+===================
+
+Test environment: OpenSUSE 11.2 (gcc 4.4 kernel 2.6.31)
+
+This example use the heap area to run its Image, Linux kernel's 
+support for the NX bit must be disabled before the program
+can run.
+
+Since NX bit resides in PAE part of the page table, recompiling
+the linux kernel without CONFIG_X86_PAE or boot the kernel with
+the parameter "noexec=off" both serves the purpose of disabling
+NX bit.
+
+--------------------------------------------------------------
+
+Below is a list of changes from the original embed_example.zip
+for running it in OpenSUSE 11.2
+
+1. The first 64k (0x0-0xFFFF) virtual address seems illegal for 
+   user application. preboot .text & .data now starts from
+   0x10000 and 0x12000 respectively. 
+
+2. gcc 4.4 generates a .eh_frame (call frames unwinding at 
+   exception handling) section for the C code it compiles when 
+   -g option is specified. But we don't need it. The removal of
+   the .eh_frame section can be done at compiled time with
+   -fno-dwarf2-cfi-asm gcc option, at linked time by linker 
+   (controlled by linker script) or by objcopy. 
+
+3. -ffreestanding option is used to disable gcc from using 
+   builtin function for certain system calls.
+
+
+--------------------------------------------------------
+
+linux kernel trace about the NX bit
+
+* arch/x86/mm/init.c
+  - noexec_setup(), __supported_pte_mask for _PAGE_NX bit
+    filtering
+* arch/x86/include/asm/pgtable_types.h 
+  - __P011, PAGE_COPY page table bit definition
+* mm/mmap.c 
+  - do_brk() vma page protection setup  
+  - protection_map[], vm_getpage_prot() rwx->pgprot mapping 
+* arch/x86/mm/fault.c
+  - do_page_fault() page fault type classify. if page fault is 
+    legal, eventually call handle_mm_fault()
+* mm/memory.c
+  - handle_mm_fault(), handle_pte_fault(), do_anonymous_page()
+  - do_anonymous_page() allocates a new page, make the pte 
+    point to the new page with pgprot = vma->vm_page_prot
+
+

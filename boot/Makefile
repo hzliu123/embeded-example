@@ -1,6 +1,8 @@
 # pre-boot loader address map
-PREBOOT_TEXT = 0x00000000
-PREBOOT_DATA = 0x00002000
+# NOTE: Linux 2.6 does not allow user program to use the first 64k 
+#       virtual address, .text cannot start at address 0 anymore
+PREBOOT_TEXT = 0x00010000
+PREBOOT_DATA = 0x00012000
 PREBOOT_LDFLAGS = -Ttext $(PREBOOT_TEXT) -Tdata $(PREBOOT_DATA) 
 
 IMAGE_LDFLAGS = -T boot.lds

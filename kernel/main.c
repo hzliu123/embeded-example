@@ -1,7 +1,7 @@
 /*
     This is the kernel.
 
-    vmkernel.bin is the image starting from offset 0x200000.
+    vmkernel.bin is the image starting from offset 0x00200000.
     It contains .text, .rodata and .data sections. 
     So all we have to do here is initialize stack pointer
     and .bss sections.

@@ -6,7 +6,7 @@ TOPDIR := $(shell /bin/pwd)
 HPATH   = $(TOPDIR)/include
 SYSTEM  = $(TOPDIR)/vmkernel
 
-CFLAGS  = -g -I$(HPATH)
+CFLAGS  = -ffreestanding -g -fno-dwarf2-cfi-asm -I$(HPATH)
 SUBDIRS = boot kernel
 
 export CC LD OBJCOPY TOPDIR HPATH CFLAGS SYSTEM

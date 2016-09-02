@@ -12,7 +12,7 @@
 	System memory map:
 
 	0x00000000		<--- preboot start ------>
-	0x0000FFFF		<--- preboot end -------->
+	0x000FFFFF		<--- preboot end -------->
 	0x00100000		<--- start of ROM area --->
 	0x001FFFFF		<--- end of ROM area ----->
 	0x00200000		<--- start of DRAM area -->

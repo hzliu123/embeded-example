@@ -6,7 +6,7 @@
 	.globl startup_32
 	
 startup_32:
-	movl $0x600000,%esp	# setup stack pointer
+	movl $0x00600000,%esp	# setup stack pointer
 	call clear_bss		# zero-init bss section on RAM
 	call init_data		# copy data section from ROM to RAM
 
