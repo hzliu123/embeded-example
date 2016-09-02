@@ -19,14 +19,24 @@
 	0x005FFFFF		<--- end of DRAM area ---->
 */
 
-#include <unistd.h>
-#include <asm/unistd.h>
+#include <asm/unistd.h>		/* _exit() .. */
+#include <unistd.h>		/* write()    */
+#include <sched.h>
 
-#define STACK_SIZE 8192
 #define CHK_VALUE 0x12345678
 
-char stack_space[STACK_SIZE];		/* located in .bss section */
-char *stack_start = &stack_space[STACK_SIZE];
+extern void time_init();
+extern void app_start();
+
+/* initial kernel stack (now moved to .data section) pointer
+ * Note that stack -must not- reside in .bss section. Since clear_bss()
+ * is a C function, it uses stack for its function return address
+ * and local variables. If the stack is in .bss, clear_bss() erases
+ * its own variables and the program hangs!
+ *
+ * This is a bug in the last embed_example!
+ */
+char * const stack_start = (char *)&init_task_union.stack[STACK_SIZE/sizeof(long)];
 
 void clear_bss() {
 	extern char __bss_start[],_end[];
@@ -36,14 +46,33 @@ void clear_bss() {
 		__bss_start[i] = 0;
 }
 
+/*
+ * The idle thread. There's no useful work to be
+ * done, so just try to conserve power and have a
+ * low exit latency (ie sit in a loop waiting for
+ * somebody to say that they'd like to reschedule)
+ * 
+ * Note that cpu_relax() is a barrier by itself.
+ * need_resched is forced reloaded from memory in 
+ * every loop.
+ */
+void cpu_idle (void)
+{
+	while (1) {
+		while (!need_resched) {
+			cpu_relax();
+		}
+		schedule();
+	}
+}
+
 /* Programming NOTE:
 
    Don't use global/static uninitialzed variables before clear_bss()
 */
-
-start_kernel() {
-	char kernel_msg[] = __FILE__": mini kernel started.\n";
-	char bsserr[] = __FILE__": error initializing .bss section\n";
+void start_kernel() {
+	const char kernel_msg[] = __FILE__": mini kernel started.\n";
+	const char bsserr[] = __FILE__": error initializing .bss section\n";
 
 	static int bss_var;			/* at .bss section */
 
@@ -58,6 +87,42 @@ start_kernel() {
 		_exit(1);
 	}
 
-	for(;;);
-}
+	local_irq_disable();
 
+	/* 
+	 * Interrupts are still disabled. Do necessary setups, then
+	 * enable them.
+       	 * 
+	 * setup_arch(); 
+	 */
+
+        /*
+         * Set up the scheduler prior starting any interrupts (such as the
+         * timer interrupt).
+	 */
+	sched_init(); 
+
+	/*
+	 * Disable preemption - early bootup scheduling is extremely
+	 * fragile until we cpu_idle() for the first time.
+	 */
+	preempt_disable();
+
+	/* build_all_zonelists();
+	 * trap_init();
+	 * init_IRQ();
+	 * softirq_init(); 
+	 */
+	time_init();
+	/* console_init(); */
+
+	local_irq_enable();
+
+	/* mem_init(); */
+
+	/* start user threads defined in apps.c */
+	app_start();
+
+	preempt_enable();
+	cpu_idle();
+}

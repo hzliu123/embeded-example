@@ -30,8 +30,8 @@
 	0x005FFFFF		<--- end of DRAM area ---->
 */
 
-#include <unistd.h>
 #include <asm/unistd.h>		/* Linux kernel header for system call */
+#include <unistd.h>
 
 #define CHK_VALUE 0x12345678
 
@@ -47,7 +47,7 @@ extern char _sdata_rom[], _sdata[], _sbss[], _end[];
 
 /* called by head.S to initialize .bss section */
 void clear_bss() {
-	char bsserr[] = __FILE__": error initializing .bss section\n";
+	const char bsserr[] = __FILE__": error initializing .bss section\n";
 
 	int i, len = _end - _sbss;
 	static int chk_value;	/* a test variable in .bss */
@@ -64,7 +64,7 @@ void clear_bss() {
 
 /* called by head.S to copy .data from ROM to RAM */
 void init_data() {
-	char dataerr[] = __FILE__": error initializing .data section\n";
+	const char dataerr[] = __FILE__": error initializing .data section\n";
 
 	static int chk_value = CHK_VALUE; /* a test variable in .data */
 	int i, len = _sbss - _sdata;
@@ -104,13 +104,13 @@ const unsigned long kernel_start = 0x00200000;
 
 void start_boot() {
 	int i, copylen;
-	char bootmsg[] = __FILE__": start_boot() start\n";
-	char bootcopy[] = __FILE__": copy vmkernel.bin from ROM to RAM\n";
-	char bootjump[] = __FILE__": pass control to the kernel\n----------\n";
+	const char bootmsg[] = __FILE__": start_boot() start\n";
+	const char bootcopy[] = __FILE__": copy vmkernel.bin from ROM to RAM\n";
+	const char bootjump[] = __FILE__": pass control to the kernel\n----------\n";
 
         write(STDOUT_FILENO, bootmsg, sizeof(bootmsg));	
 
-	/*4* copy kernel to RAM */
+	/* copy kernel to RAM */
 	write(STDOUT_FILENO, bootcopy, sizeof(bootcopy));
 	copylen = _ekdata - _skdata;
 	for (i=0; i < copylen; i++) 

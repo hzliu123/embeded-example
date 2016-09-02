@@ -19,9 +19,10 @@
 	0x005FFFFF		<--- end of DRAM area ---->
 */
 
-#include <unistd.h>
 #include <asm/unistd.h>
-#include <asm/fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #define READSIZE 1024
 #define IMG_FILENAME "Image" 
@@ -34,14 +35,14 @@ const unsigned long boot_start = 0x00100000;
 */
 
 void _start() {
-	char pbmsg[] = __FILE__": _start() start...\n";
-	char pbcopy[] = __FILE__": copy Image to ROM\n";
-	char pbjump[] = __FILE__": pass control to boot loader\n----------\n";
-	char brkerr[] = __FILE__": failed to increase data segment space.\n";
-	char image_err[] = __FILE__": failed to stat/open \"Image\" file.\n";
-	char readerr[] = __FILE__": read \"Image\" failed.\n";
+	const char pbmsg[] = __FILE__": _start() start...\n";
+	const char pbcopy[] = __FILE__": copy Image to ROM\n";
+	const char pbjump[] = __FILE__": pass control to boot loader\n----------\n";
+	const char brkerr[] = __FILE__": failed to increase data segment space.\n";
+	const char image_err[] = __FILE__": failed to stat/open \"Image\" file.\n";
+	const char readerr[] = __FILE__": read \"Image\" failed.\n";
 
-	int imgfd, imgsize, i, byte_read;
+	int imgfd, i, byte_read;
 	struct stat statbuf;
 	char *ptr = (char *)boot_start;
 

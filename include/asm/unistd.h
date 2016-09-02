@@ -290,7 +290,8 @@ type name(void) \
 long __res; \
 __asm__ volatile ("int $0x80" \
 	: "=a" (__res) \
-	: "0" (__NR_##name)); \
+	: "0" (__NR_##name) \
+	: "memory"); \
 __syscall_return(type,__res); \
 }
 
@@ -300,7 +301,8 @@ type name(type1 arg1) \
 long __res; \
 __asm__ volatile ("int $0x80" \
 	: "=a" (__res) \
-	: "0" (__NR_##name),"b" ((long)(arg1))); \
+	: "0" (__NR_##name),"b" ((long)(arg1)) \
+	: "memory"); \
 __syscall_return(type,__res); \
 }
 
@@ -310,7 +312,8 @@ type name(type1 arg1,type2 arg2) \
 long __res; \
 __asm__ volatile ("int $0x80" \
 	: "=a" (__res) \
-	: "0" (__NR_##name),"b" ((long)(arg1)),"c" ((long)(arg2))); \
+	: "0" (__NR_##name),"b" ((long)(arg1)),"c" ((long)(arg2)) \
+	: "memory"); \
 __syscall_return(type,__res); \
 }
 
@@ -321,7 +324,8 @@ long __res; \
 __asm__ volatile ("int $0x80" \
 	: "=a" (__res) \
 	: "0" (__NR_##name),"b" ((long)(arg1)),"c" ((long)(arg2)), \
-		  "d" ((long)(arg3))); \
+		  "d" ((long)(arg3)) \
+	: "memory"); \
 __syscall_return(type,__res); \
 }
 
@@ -332,7 +336,8 @@ long __res; \
 __asm__ volatile ("int $0x80" \
 	: "=a" (__res) \
 	: "0" (__NR_##name),"b" ((long)(arg1)),"c" ((long)(arg2)), \
-	  "d" ((long)(arg3)),"S" ((long)(arg4))); \
+	  "d" ((long)(arg3)),"S" ((long)(arg4)) \
+	: "memory"); \
 __syscall_return(type,__res); \
 } 
 
@@ -344,7 +349,8 @@ long __res; \
 __asm__ volatile ("int $0x80" \
 	: "=a" (__res) \
 	: "0" (__NR_##name),"b" ((long)(arg1)),"c" ((long)(arg2)), \
-	  "d" ((long)(arg3)),"S" ((long)(arg4)),"D" ((long)(arg5))); \
+	  "d" ((long)(arg3)),"S" ((long)(arg4)),"D" ((long)(arg5)) \
+	: "memory"); \
 __syscall_return(type,__res); \
 }
 
@@ -357,24 +363,19 @@ __asm__ volatile ("push %%ebp ; movl %%eax,%%ebp ; movl %1,%%eax ; int $0x80 ; p
 	: "=a" (__res) \
 	: "i" (__NR_##name),"b" ((long)(arg1)),"c" ((long)(arg2)), \
 	  "d" ((long)(arg3)),"S" ((long)(arg4)),"D" ((long)(arg5)), \
-	  "0" ((long)(arg6))); \
+	  "0" ((long)(arg6)) \
+	: "memory"); \
 __syscall_return(type,__res); \
 }
 
-/*
- * we need this inline - forking from kernel space will result
- * in NO COPY ON WRITE (!!!), until an execve is executed. This
- * is no problem, but for the stack. This is handled by not letting
- * main() use the stack at all after fork(). Thus, no function
- * calls - which means inline code for fork too, as otherwise we
- * would use the stack upon exit from 'fork()'.
- *
- * Actually only pause and fork are needed inline, so that there
- * won't be any messing with the stack from main(), but we define
- * some others too.
- */
 #define __NR__exit __NR_exit
-#include <asm/stat.h>
+#ifndef __sigset_t_defined
+#define __sigset_t_defined
+typedef unsigned long sigset_t;
+#endif
+struct stat;
+struct itimerval;
+struct sigaction;
 
 static inline _syscall3(int,write,int,fd,const char *,buf,long,count)
 static inline _syscall1(int,_exit,int,exitcode)
@@ -382,5 +383,8 @@ static inline _syscall1(unsigned long,brk,unsigned long,brk)
 static inline _syscall3(int,open,const char *,file,int,flag,int,mode)
 static inline _syscall3(int,read,int,fd,char *,buf,long,count)
 static inline _syscall2(long,stat,char *,filename,struct stat *,statbuf)
+static inline _syscall3(int,setitimer,int,which,const struct itimerval *,new_value,struct itimerval *,old_value)
+static inline _syscall3(int,sigprocmask,int,how,const sigset_t *,set,sigset_t *,oldset)
+static inline _syscall3(int,sigaction,int,signum,const struct sigaction *,act,struct sigaction *,oldact)
 
 #endif /* _ASM_I386_UNISTD_H_ */

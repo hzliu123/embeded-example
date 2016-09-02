@@ -1,15 +1,17 @@
 CC 	= /usr/bin/gcc
 LD 	= /usr/bin/ld
 OBJCOPY = /usr/bin/objcopy
+AR	= /usr/bin/ar
 
 TOPDIR := $(shell /bin/pwd)
 HPATH   = $(TOPDIR)/include
+LIBPATH = $(TOPDIR)/lib
 SYSTEM  = $(TOPDIR)/vmkernel
 
-CFLAGS  = -ffreestanding -g -fno-dwarf2-cfi-asm -I$(HPATH)
-SUBDIRS = boot kernel
+CFLAGS  = -Wall -ffreestanding -g -fno-dwarf2-cfi-asm -I$(HPATH)
+SUBDIRS = lib boot kernel
 
-export CC LD OBJCOPY TOPDIR HPATH CFLAGS SYSTEM
+export CC LD OBJCOPY AR TOPDIR HPATH LIBPATH CFLAGS SYSTEM
 
 .PHONY: clean subdirs $(SUBDIRS)
 

@@ -1,4 +1,7 @@
-LDFLAGS = -T vmkernel.lds
+LDFLAGS	= -T vmkernel.lds -L $(LIBPATH) -lprintf
+PWD	:= $(shell pwd)
+CFLAGS	+= -I$(PWD)/include 
+SYSOBJS := head.o main.o printk.o time.o process.o apps.o
 
 all: $(SYSTEM)
 
@@ -8,8 +11,8 @@ all: $(SYSTEM)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $<
 
-$(SYSTEM): head.o main.o
-	$(LD) $(LDFLAGS) -o $@ $^
+$(SYSTEM): $(SYSOBJS)
+	$(LD) -o $@ $^ $(LDFLAGS) 
 clean:
-	rm -f head.o main.o $(SYSTEM)
+	rm -f $(SYSOBJS) $(SYSTEM)
 
