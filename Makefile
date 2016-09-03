@@ -15,6 +15,8 @@ SUBDIRS = lib boot kernel
 ifeq ($(shell uname -m),x86_64)
 	CFLAGS += -m32
 	LDFLAGS += -melf_i386 --oformat=elf32-i386
+else
+	LDFLAGS += --oformat=elf32-i386
 endif
 
 export CC LD OBJCOPY AR TOPDIR HPATH LIBPATH CFLAGS LDFLAGS SYSTEM
