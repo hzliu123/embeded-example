@@ -31,6 +31,7 @@ Image: head.o boot.o piggy.o
 # run preboot to load Image, preboot is in ELF format
 preboot: preboot.o
 	$(LD) $(PREBOOT_LDFLAGS) -o $@ $<
+	$(OBJCOPY) -R .plt -R .rel.plt -R .got.plt $@
  
 clean:
 	rm -f preboot preboot.o head.o boot.o piggy.o Image.elf Image

@@ -41,7 +41,7 @@ void _start() {
 	char image_err[] = __FILE__": failed to stat/open \"Image\" file.\n";
 	char readerr[] = __FILE__": read \"Image\" failed.\n";
 
-	int imgfd, imgsize, i, byte_read;
+	int imgfd, i, byte_read;
 	struct stat statbuf;
 	char *ptr = (char *)boot_start;
 

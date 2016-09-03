@@ -25,13 +25,14 @@
 #define STACK_SIZE 8192
 #define CHK_VALUE 0x12345678
 
-char stack_space[STACK_SIZE];		/* located in .bss section */
+/* bugfix: can't be in .bss section */
+char stack_space[STACK_SIZE] = { [0 ... STACK_SIZE-1] = '\1' };
 char *stack_start = &stack_space[STACK_SIZE];
 
 void clear_bss() {
 	extern char __bss_start[],_end[];
 	int i, len = _end - __bss_start;
-	
+
 	for (i=0; i<len; i++)
 		__bss_start[i] = 0;
 }
@@ -41,7 +42,7 @@ void clear_bss() {
    Don't use global/static uninitialzed variables before clear_bss()
 */
 
-start_kernel() {
+void start_kernel() {
 	char kernel_msg[] = __FILE__": mini kernel started.\n";
 	char bsserr[] = __FILE__": error initializing .bss section\n";
 

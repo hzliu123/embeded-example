@@ -110,7 +110,7 @@ void start_boot() {
 
         write(STDOUT_FILENO, bootmsg, sizeof(bootmsg));	
 
-	/*4* copy kernel to RAM */
+	/* copy kernel to RAM */
 	write(STDOUT_FILENO, bootcopy, sizeof(bootcopy));
 	copylen = _ekdata - _skdata;
 	for (i=0; i < copylen; i++) 
