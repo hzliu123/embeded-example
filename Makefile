@@ -10,7 +10,7 @@ SYSTEM  = $(TOPDIR)/vmkernel
 
 CFLAGS  = -Wall -ffreestanding -g -fno-dwarf2-cfi-asm -I$(HPATH)
 SUBDIRS = lib boot kernel
-
+ 
 export CC LD OBJCOPY AR TOPDIR HPATH LIBPATH CFLAGS SYSTEM
 
 .PHONY: clean subdirs $(SUBDIRS)

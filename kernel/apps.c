@@ -41,7 +41,7 @@ try_queue:
 				enqueue_sum = enqueue_count = 0;
 			}
 			cpu_relax();
-			/* remove line below after timer interrupt is up */
+			/* REMOVE LINE BELOW AFTER TIMER INTERRUPT IS READY */
 			schedule();
 			continue;
 		}
@@ -71,7 +71,7 @@ try_dequeue:
 				dequeue_sum = dequeue_count = 0;
 			}
 			cpu_relax();
-			/* remove line below after interrupt is up */
+			/* REMOVE LINE BELOW AFTER INTERRUPT IS READY */
 			schedule();
 			continue;
 		}

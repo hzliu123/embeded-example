@@ -35,6 +35,9 @@ void timer_interrupt(int num) {
  * called. This leaves SIGALRM masked (timer interrupt blocked) after SIGALRM
  * handler (timer interrupt) switches context. We use SA_NODEFER sa_flags to
  * solve the problem.
+ *
+ * 2011/06 -- Use SIGVTALRM instead so that no additional signal occurs when
+ *            the program is stopped by GDB.
  */
 void time_init() {
 

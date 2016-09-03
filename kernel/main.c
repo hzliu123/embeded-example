@@ -22,7 +22,7 @@
 #include <asm/unistd.h>		/* _exit() .. */
 #include <unistd.h>		/* write()    */
 #include <sched.h>
-
+ 
 #define CHK_VALUE 0x12345678
 
 extern void time_init();
@@ -37,11 +37,11 @@ extern void app_start();
  * This is a bug in the last embed_example!
  */
 char * const stack_start = (char *)&init_task_union.stack[STACK_SIZE/sizeof(long)];
-
+ 
 void clear_bss() {
 	extern char __bss_start[],_end[];
 	int i, len = _end - __bss_start;
-	
+
 	for (i=0; i<len; i++)
 		__bss_start[i] = 0;
 }
@@ -60,7 +60,7 @@ void cpu_idle (void)
 {
 	while (1) {
 		while (!need_resched) {
-			/* remove line below after timer interrupt is up */
+			/* REMOVE LINE BELOW AFTER TIMER INTERRUPT IS READY */
 			need_resched = 1;
 			cpu_relax();
 		}
@@ -72,6 +72,7 @@ void cpu_idle (void)
 
    Don't use global/static uninitialzed variables before clear_bss()
 */
+
 void start_kernel() {
 	const char kernel_msg[] = __FILE__": mini kernel started.\n";
 	const char bsserr[] = __FILE__": error initializing .bss section\n";
