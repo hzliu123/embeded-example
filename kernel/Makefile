@@ -1,8 +1,8 @@
-LDFLAGS	= -T vmkernel.lds -L $(LIBPATH) -lprintf
+LDFLAGS += -T vmkernel.lds -L $(LIBPATH) -lprintf
 PWD	:= $(shell pwd)
 CFLAGS	+= -I$(PWD)/include 
 SYSOBJS := head.o main.o printk.o time.o process.o apps.o
-
+ 
 all: $(SYSTEM)
 
 %.o: %.S

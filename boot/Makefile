@@ -3,9 +3,9 @@
 #       virtual address, .text cannot start at address 0 anymore
 PREBOOT_TEXT = 0x00010000
 PREBOOT_DATA = 0x00012000
-PREBOOT_LDFLAGS = -Ttext $(PREBOOT_TEXT) -Tdata $(PREBOOT_DATA) 
+PREBOOT_LDFLAGS = -Ttext $(PREBOOT_TEXT) -Tdata $(PREBOOT_DATA) $(LDFLAGS)
 
-IMAGE_LDFLAGS = -T boot.lds
+IMAGE_LDFLAGS = -T boot.lds $(LDFLAGS)
 
 all: Image preboot
 
@@ -20,7 +20,7 @@ all: Image preboot
 # kernel must be in binary format since ELF loader is not available
 piggy.o: $(SYSTEM)
 	$(OBJCOPY) -O binary $(SYSTEM) vmkernel.bin
-	$(LD) -o $@ -r --format binary --oformat elf32-i386 vmkernel.bin -T piggy.lds
+	$(LD) -o $@ -r --format binary $(LDFLAGS) vmkernel.bin -T piggy.lds
 	rm -f vmkernel.bin
 
 # Image is bootloader + piggy.o
