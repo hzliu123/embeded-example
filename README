@@ -3,6 +3,7 @@ NOTE FOR 2.6 KERNEL
 ===================
 
 Test environment: OpenSUSE 11.2 (gcc 4.4 kernel 2.6.31)
+		  Ubuntu 11.04 (gcc 4.5.2 kernel 2.6.38)
 
 This example use the heap area to run its Image, Linux kernel's 
 support for the NX bit must be disabled before the program
@@ -12,6 +13,16 @@ Since NX bit resides in PAE part of the page table, recompiling
 the linux kernel without CONFIG_X86_PAE or boot the kernel with
 the parameter "noexec=off" both serves the purpose of disabling
 NX bit.
+
+To run under Ubuntu 11.04, you will also have to:
+
+1) disable randomization of process virtual address space
+2) disable vdso (virtual dynamic shared object)
+3) allow memory allocated from low address space
+
+$ sudo sysctl kernel.randomize_va_space=0
+$ sudo sysctl vm.vdso_enabled=0
+$ sudo sysctl vm.mmap_min_addr=0
 
 --------------------------------------------------------------
 

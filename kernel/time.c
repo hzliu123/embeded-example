@@ -45,6 +45,9 @@ void timer_interrupt(int num) {
  * called. This leaves SIGALRM masked (timer interrupt blocked) after SIGALRM
  * handler (timer interrupt) switches context. We use SA_NODEFER sa_flags to
  * solve the problem.
+ *
+ * 2011/06 -- Use SIGVTALRM instead so that no additional signal occurs when
+ *            the program is stopped by GDB.
  */
 void time_init() {
 	const unsigned long tick_usec = 1000000 / HZ;
@@ -61,7 +64,7 @@ void time_init() {
 	act.sa_handler = timer_interrupt;
 	sigemptyset(&act.sa_mask);
 	act.sa_flags = SA_NODEFER;
-	sigaction(SIGALRM, &act, NULL);
+	sigaction(SIGVTALRM, &act, NULL);
 
 	/* 
 	 * set_pit_timer() - timer chip programming
@@ -70,7 +73,7 @@ void time_init() {
 	value.it_interval.tv_sec = tick_usec / usec_per_sec;
 	value.it_interval.tv_usec = tick_usec % usec_per_sec;
 	value.it_value = value.it_interval;
-	setitimer(ITIMER_REAL, &value, NULL);
+	setitimer(ITIMER_VIRTUAL, &value, NULL);
 
 	printk("Timer initialized.\n");	
 }
