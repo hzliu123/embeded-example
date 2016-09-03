@@ -1,9 +1,8 @@
-===================
-NOTE FOR 2.6 KERNEL
-===================
+============================
+NOTE FOR KERNEL 2.6 or later
+============================
 
-Test environment: OpenSUSE 11.2 (gcc 4.4 kernel 2.6.31)
-		  Ubuntu 11.04 (gcc 4.5.2 kernel 2.6.38)
+Tested environment: Ubuntu 16.04 (gcc 5.3.1 kernel 4.4.0)
 
 This example use the heap area to run its Image, Linux kernel's 
 support for the NX bit must be disabled before the program
@@ -11,25 +10,33 @@ can run.
 
 Since NX bit resides in PAE part of the page table, recompiling
 the linux kernel without CONFIG_X86_PAE or boot the kernel with
-the parameter "noexec=off" both serves the purpose of disabling
+the parameter "noexec=off" both serve the purpose of disabling
 NX bit.
 
-To run under Ubuntu 11.04, you will also have to:
+You also need to:
 
 1) disable randomization of process virtual address space
-2) disable vdso (virtual dynamic shared object)
-3) allow memory allocated from low address space
 
 $ sudo sysctl kernel.randomize_va_space=0
-$ sudo sysctl vm.vdso_enabled=0
-$ sudo sysctl vm.mmap_min_addr=0
 
---------------------------------------------------------------
 
-Below is a list of changes from the original embed_example.zip
-for running it in OpenSUSE 11.2
+You may need these if your environment is not Ubuntu 16.04:
 
-1. The first 64k (0x0-0xFFFF) virtual address seems illegal for 
+2) disable vdso (virtual dynamic shared object)
+
+$ sudo sysctl abi.vsyscall32=0
+
+3) allow memory allocated from low address space
+
+$ sudo sysctl vm.mmap_min_addr=65536
+
+---------------------------------------------------------------
+
+Below is a list of changes to the original embed_example.zip,
+which was developed for kernel 2.4, for running it on kernel 
+2.6 or later.
+
+1. The first 64k (0x0-0xFFFF) virtual address isn't usable for 
    user application. preboot .text & .data now starts from
    0x10000 and 0x12000 respectively. 
 
