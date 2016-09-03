@@ -1,4 +1,4 @@
-LDFLAGS = -T vmkernel.lds
+LDFLAGS += -T vmkernel.lds
 
 all: $(SYSTEM)
 
