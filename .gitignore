@@ -1,0 +1,6 @@
+*.o
+*.a
+*.elf
+vmkernel
+boot/Image
+boot/preboot
